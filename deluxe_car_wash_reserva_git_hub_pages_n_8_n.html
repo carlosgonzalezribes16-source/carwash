@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reservas – Deluxe Car Wash Valencia</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin:0; background:#0d1117; color:#f0f6fc; }
+    header { background:#161b22; padding:20px; text-align:center; }
+    header h1 { color:#58a6ff; margin:0; }
+    nav { display:flex; justify-content:center; background:#0d1117; border-bottom:1px solid #30363d; }
+    nav button { background:none; border:none; color:#c9d1d9; padding:15px 20px; cursor:pointer; font-size:16px; }
+    nav button.active, nav button:hover { background:#21262d; color:#58a6ff; }
+    section { display:none; padding:20px; max-width:700px; margin:auto; }
+    section.active { display:block; }
+    h2 { color:#58a6ff; }
+    form { display:grid; gap:10px; margin-top:20px; }
+    label { font-weight:bold; }
+    input, select { padding:10px; border:1px solid #30363d; border-radius:5px; background:#161b22; color:#f0f6fc; }
+    button.submit { background:#238636; color:white; border:none; padding:12px; cursor:pointer; border-radius:5px; font-size:16px; }
+    button.submit:hover { background:#2ea043; }
+    .msg { margin-top:10px; font-weight:bold; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Deluxe Car Wash Valencia</h1>
+    <p>Reserva tu servicio de limpieza y cuidado profesional para tu coche o moto</p>
+  </header>
+  <nav>
+    <button class="tab active" data-target="servicios">Servicios</button>
+    <button class="tab" data-target="reservar">Reservar</button>
+  </nav>
+
+  <section id="servicios" class="active">
+    <h2>Nuestros Servicios</h2>
+    <p><b>Lavado Exterior (30 min)</b>: Limpieza detallada de la carrocería y llantas.</p>
+    <p><b>Lavado Interior (30 min)</b>: Aspirado y limpieza de interiores, salpicadero y alfombrillas.</p>
+    <p><b>Lavado Completo (1h)</b>: Combinación de lavado exterior e interior.</p>
+    <p><b>Lavado con Cera (1h)</b>: Protección extra con cera para mayor brillo y durabilidad.</p>
+    <p><b>Limpieza Deluxe (1h30)</b>: Tratamiento premium interior y exterior en profundidad.</p>
+    <p><b>Restauración de Faros (2h)</b>: Recupera la claridad y seguridad de tus faros.</p>
+    <p><b>Limpieza de Tapicería (4h)</b>: Eliminación de manchas y olores en asientos y tejidos.</p>
+    <p><b>Pulimento de Carrocería (6h)</b>: Devuelve el brillo a la pintura y elimina pequeños arañazos.</p>
+    <p><b>Lavado de Motos (30 min)</b>: Limpieza adaptada a motos, cuidando cada detalle.</p>
+  </section>
+
+  <section id="reservar">
+    <h2>Formulario de Reserva</h2>
+    <form id="reservaForm">
+      <label>Nombre</label>
+      <input type="text" id="nombre" required>
+      <label>Teléfono</label>
+      <input type="tel" id="telefono" required>
+      <label>Correo (opcional)</label>
+      <input type="email" id="correo">
+      <label>Matrícula</label>
+      <input type="text" id="matricula" required>
+      <label>Modelo del coche</label>
+      <input type="text" id="modelo" required>
+      <label>Servicio</label>
+      <select id="servicio" required>
+        <option value="">Selecciona un servicio</option>
+        <option>Lavado Exterior</option>
+        <option>Lavado Interior</option>
+        <option>Lavado Completo</option>
+        <option>Lavado con Cera</option>
+        <option>Limpieza Deluxe</option>
+        <option>Restauración de Faros</option>
+        <option>Limpieza de Tapicería</option>
+        <option>Pulimento de Carrocería</option>
+        <option>Lavado de Motos</option>
+      </select>
+      <label>Fecha</label>
+      <input type="date" id="fecha" required>
+      <label>Hora</label>
+      <input type="time" id="hora" required>
+      <button type="submit" class="submit">Reservar</button>
+      <div id="mensaje" class="msg"></div>
+    </form>
+  </section>
+
+  <script>
+    // Tabs
+    document.querySelectorAll('.tab').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        document.querySelectorAll('section').forEach(sec => sec.classList.remove('active'));
+        document.getElementById(btn.dataset.target).classList.add('active');
+      });
+    });
+
+    // Form submit
+    document.getElementById("reservaForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const data = {
+        nombre: document.getElementById("nombre").value,
+        telefono: document.getElementById("telefono").value.replace(/\D+/g, ""),
+        correo: document.getElementById("correo").value,
+        matricula: document.getElementById("matricula").value.toUpperCase().replace(/\s+/g, ""),
+        modelo: document.getElementById("modelo").value,
+        servicio_coche: document.getElementById("servicio").value,
+        fecha: document.getElementById("fecha").value,
+        hora: document.getElementById("hora").value,
+        servicio: "reserva"
+      };
+      try {
+        const resp = await fetch("https://gonxo14.app.n8n.cloud/webhook/carwash", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data)
+        });
+        document.getElementById("mensaje").innerText = resp.ok ? "✅ Reserva enviada correctamente" : "❌ Error al enviar la reserva";
+      } catch (err) {
+        document.getElementById("mensaje").innerText = "❌ Error de conexión";
+      }
+    });
+  </script>
+</body>
+</html>
